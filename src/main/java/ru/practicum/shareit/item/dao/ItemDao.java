@@ -6,8 +6,12 @@ import java.util.List;
 
 public interface ItemDao {
     List<Item> getItems();
+
     Item createItem(Item item);
+
     Item updateItem(Item item);
+
     Item getItemById(int id);
+
     List<Item> search(String text);
 }
