@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class InMemoryUserDao implements UserDao {
@@ -28,7 +29,7 @@ public class InMemoryUserDao implements UserDao {
     public User updateUser(User user) {
         int index = -1;
         for (User iUser : users) {
-            if (iUser.getId() == user.getId()) {
+            if (Objects.equals(iUser.getId(), user.getId())) {
                 index = users.indexOf(iUser);
                 break;
             }
@@ -41,7 +42,7 @@ public class InMemoryUserDao implements UserDao {
                 user.setEmail(users.get(index).getEmail());
             } else {
                 for (User iUser : users) {
-                    if (iUser.getEmail().equals(user.getEmail()) && iUser.getId() != user.getId()) {
+                    if (iUser.getEmail().equals(user.getEmail()) && !Objects.equals(iUser.getId(), user.getId())) {
                         throw new DuplicateEmailException(String.format("Пользователь с email = %s уже существует.",
                                 user.getEmail()));
                     }
