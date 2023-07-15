@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -23,8 +24,8 @@ public class ItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
-//    @ManyToOne
-//    @Column(name = "requester_id")
-//    private User requester;
+    @ManyToOne
+    @Column(name = "requester_id")
+    private User requester;
     private LocalDateTime created;
 }
