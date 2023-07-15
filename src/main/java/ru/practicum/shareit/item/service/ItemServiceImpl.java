@@ -124,10 +124,23 @@ public class ItemServiceImpl implements ItemService {
                 List<Booking> bookings = bookingRepository.findBookingByItem_IdAndStatus(item.getId(), Status.APPROVED);
                 if (bookings.size() != 0) {
                     bookings = bookings.stream()
-                            .sorted(Comparator.comparing(Booking::getId))
+                            .sorted(Comparator.comparing(Booking::getStart).reversed())
                             .collect(Collectors.toList());
-                    itemDto.setLastBooking(BookingMapper.toBookingDto(bookings.get(0)));
-                    itemDto.setNextBooking(BookingMapper.toBookingDto(bookings.get(3)));
+                    for (Booking booking : bookings) {
+                        if (booking.getStart().isBefore(LocalDateTime.now())) {
+                            itemDto.setLastBooking(BookingMapper.toBookingDto(booking));
+                            break;
+                        }
+                    }
+                    bookings = bookings.stream()
+                            .sorted(Comparator.comparing(Booking::getStart))
+                            .collect(Collectors.toList());
+                    for (Booking booking : bookings) {
+                        if (booking.getStart().isAfter(LocalDateTime.now())) {
+                            itemDto.setNextBooking(BookingMapper.toBookingDto(booking));
+                            break;
+                        }
+                    }
                 }
             }
             return itemDto;
