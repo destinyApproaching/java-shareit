@@ -1,10 +1,12 @@
 package ru.practicum.shareit.item.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.user.User;
+
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -12,18 +14,14 @@ import ru.practicum.shareit.request.ItemRequest;
 
 @Data
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ItemDto {
-    @JsonProperty("id")
-    private Integer id;
-    @JsonProperty("name")
+    private Long id;
     private String name;
-    @JsonProperty("description")
     private String description;
-    @JsonProperty("available")
     private Boolean available;
-    @JsonProperty("owner")
-    private int owner;
-    @JsonProperty("request")
+    private User owner;
     private ItemRequest request;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
+    private List<CommentDto> comments;
 }

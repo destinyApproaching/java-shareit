@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public class InMemoryUserDao implements UserDao {
-    private int id = 1;
+    private Long id = 1L;
 
     private final List<User> users = new ArrayList<>();
 
@@ -82,7 +82,7 @@ public class InMemoryUserDao implements UserDao {
         throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", id));
     }
 
-    private int getId() {
+    private Long getId() {
         return id;
     }
 
