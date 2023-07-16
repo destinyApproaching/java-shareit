@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exception.StateException;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -40,24 +39,12 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getBookingsOfUser(@RequestHeader("X-Sharer-User-Id") Long userId,
                                               @RequestParam(defaultValue = "ALL") String state) {
-        try {
-            State.valueOf(state);
-
-        } catch (IllegalArgumentException e) {
-            throw new StateException("Unknown state: UNSUPPORTED_STATUS");
-        }
-        return bookingService.getBookingsOfUser(userId, State.valueOf(state));
+        return bookingService.getBookingsOfUser(userId, state);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getBookingsByItemOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                                   @RequestParam(defaultValue = "ALL") String state) {
-        try {
-            State.valueOf(state);
-
-        } catch (IllegalArgumentException e) {
-            throw new StateException("Unknown state: UNSUPPORTED_STATUS");
-        }
-        return bookingService.getBookingsByItemOwner(userId, State.valueOf(state));
+        return bookingService.getBookingsByItemOwner(userId, state);
     }
 }

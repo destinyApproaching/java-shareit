@@ -91,14 +91,20 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingsOfUser(Long userId, State state) {
+    public List<BookingDto> getBookingsOfUser(Long userId, String state) {
+        try {
+            State.valueOf(state);
+
+        } catch (IllegalArgumentException e) {
+            throw new StateException("Unknown state: UNSUPPORTED_STATUS");
+        }
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException(String.format("Пользователя с id = %d не существует.", userId));
         }
         List<Booking> bookings;
         LocalDateTime time = LocalDateTime.now();
-        switch (state) {
+        switch (State.valueOf(state)) {
             case PAST:
                 bookings = bookingRepository.findByBooker_IdAndEndIsBefore(userId, time, sort);
                 break;
@@ -125,14 +131,20 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookingsByItemOwner(Long userId, State state) {
+    public List<BookingDto> getBookingsByItemOwner(Long userId, String state) {
+        try {
+            State.valueOf(state);
+
+        } catch (IllegalArgumentException e) {
+            throw new StateException("Unknown state: UNSUPPORTED_STATUS");
+        }
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException(String.format("Пользователя с id = %d не существует.", userId));
         }
         List<Booking> bookings;
         LocalDateTime time = LocalDateTime.now();
-        switch (state) {
+        switch (State.valueOf(state)) {
             case PAST:
                 bookings = bookingRepository.findByItemOwnerIdAndEndIsBefore(userId, time, sort);
                 break;

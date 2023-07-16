@@ -13,10 +13,10 @@ public interface BookingService {
 
     BookingDto getBooking(Long userId, Long bookingId);
 
-    List<BookingDto> getBookingsOfUser(Long userId, State state);
+    List<BookingDto> getBookingsOfUser(Long userId, String state);
     // Получение списка всех бронирований текущего пользователя.
 
 
-    List<BookingDto> getBookingsByItemOwner(Long userId, State state);
+    List<BookingDto> getBookingsByItemOwner(Long userId, String state);
     // Получение списка бронирований для всех вещей текущего пользователя.
 }
