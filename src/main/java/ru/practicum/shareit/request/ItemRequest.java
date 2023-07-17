@@ -1,9 +1,10 @@
 package ru.practicum.shareit.request;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.user.User;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -11,10 +12,21 @@ import java.time.LocalDateTime;
  */
 
 @Data
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "requests", schema = "public")
 public class ItemRequest {
-    private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "description")
     private String description;
-    private User requestor;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requester_id", nullable = false)
+    private User requester;
+    @CreationTimestamp
+    @Column(name = "created")
     private LocalDateTime created;
 }

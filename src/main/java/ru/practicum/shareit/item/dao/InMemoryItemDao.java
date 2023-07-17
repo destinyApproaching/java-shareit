@@ -7,10 +7,11 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class InMemoryItemDao implements ItemDao {
-    private int id = 1;
+    private Long id = 1L;
 
     private final List<Item> items = new ArrayList<>();
 
@@ -32,7 +33,7 @@ public class InMemoryItemDao implements ItemDao {
     public Item updateItem(Item item) {
         int index = -1;
         for (Item iItem : items) {
-            if (iItem.getId() == item.getId()) {
+            if (Objects.equals(iItem.getId(), item.getId())) {
                 index = items.indexOf(iItem);
                 break;
             }
@@ -82,7 +83,7 @@ public class InMemoryItemDao implements ItemDao {
         return searchItems;
     }
 
-    private int getId() {
+    private Long getId() {
         return id;
     }
 
