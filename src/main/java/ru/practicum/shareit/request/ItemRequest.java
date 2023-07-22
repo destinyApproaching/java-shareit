@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  */
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "requests", schema = "public")
@@ -21,12 +21,10 @@ public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "description")
     private String description;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
     @CreationTimestamp
-    @Column(name = "created")
     private LocalDateTime created;
 }

@@ -1,11 +1,17 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 /**
@@ -38,13 +44,23 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getBookingsOfUser(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                              @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getBookingsOfUser(userId, state);
+                                              @RequestParam(defaultValue = "ALL") String state,
+                                              @RequestParam(defaultValue = "0") @Min(0) @PositiveOrZero Integer from,
+                                              @RequestParam(defaultValue = "10") @Min(1) @Max(100) @Positive Integer size) {
+        if (from < 0 || size < 1) {
+            throw new ValidationException("Переданы неверные параметры.");
+        }
+        return bookingService.getBookingsOfUser(userId, state, PageRequest.of(from / size, size));
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getBookingsByItemOwner(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                  @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getBookingsByItemOwner(userId, state);
+                                                   @RequestParam(defaultValue = "ALL") String state,
+                                                   @RequestParam(defaultValue = "0") @Min(0) @PositiveOrZero Integer from,
+                                                   @RequestParam(defaultValue = "10") @Min(1) @Max(100) @Positive Integer size) {
+        if (from < 0 || size < 1) {
+            throw new ValidationException("Переданы неверные параметры.");
+        }
+        return bookingService.getBookingsByItemOwner(userId, state, PageRequest.of(from / size, size));
     }
 }

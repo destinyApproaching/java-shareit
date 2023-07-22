@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -15,6 +17,8 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -33,38 +37,38 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     @Override
-    public List<ItemDto> getItems(Long id) {
-        List<Item> items = itemRepository.findAll();
+    public List<ItemDto> getItems(Long id, Pageable pageable) {
+        Page<Item> items = itemRepository.findByOwnerId(id, pageable);
         List<ItemDto> itemDtos = new ArrayList<>();
         for (Item item : items) {
             ItemDto itemDto = ItemMapper.toItemDto(item);
             List<Comment> comments = commentRepository.findCommentsByItem_Id(item.getId());
             itemDto.setComments(comments.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
-            if (Objects.equals(item.getOwner().getId(), id)) {
-                List<Booking> bookings = bookingRepository.findBookingByItem_IdAndStatus(item.getId(), Status.APPROVED);
-                if (bookings.size() != 0) {
-                    bookings = bookings.stream()
-                            .sorted(Comparator.comparing(Booking::getStart).reversed())
-                            .collect(Collectors.toList());
-                    for (Booking booking : bookings) {
-                        if (booking.getStart().isBefore(LocalDateTime.now())) {
-                            itemDto.setLastBooking(BookingMapper.toBookingDto(booking));
-                            break;
-                        }
-                    }
-                    bookings = bookings.stream()
-                            .sorted(Comparator.comparing(Booking::getStart))
-                            .collect(Collectors.toList());
-                    for (Booking booking : bookings) {
-                        if (booking.getStart().isAfter(LocalDateTime.now())) {
-                            itemDto.setNextBooking(BookingMapper.toBookingDto(booking));
-                            break;
-                        }
+            List<Booking> bookings = bookingRepository.findBookingByItem_IdAndStatus(item.getId(), Status.APPROVED);
+            if (bookings.size() != 0) {
+                bookings = bookings.stream()
+                        .sorted(Comparator.comparing(Booking::getStart).reversed())
+                        .collect(Collectors.toList());
+                for (Booking booking : bookings) {
+                    if (booking.getStart().isBefore(LocalDateTime.now())) {
+                        itemDto.setLastBooking(BookingMapper.toBookingDto(booking));
+                        break;
                     }
                 }
-                itemDtos.add(itemDto);
+                bookings = bookings.stream()
+                        .sorted(Comparator.comparing(Booking::getStart))
+                        .collect(Collectors.toList());
+                for (Booking booking : bookings) {
+                    if (booking.getStart().isAfter(LocalDateTime.now())) {
+                        itemDto.setNextBooking(BookingMapper.toBookingDto(booking));
+                        break;
+                    }
+                }
             }
+            itemDtos.add(itemDto);
         }
         return itemDtos.stream()
                 .sorted(Comparator.comparing(ItemDto::getId))
@@ -76,11 +80,22 @@ public class ItemServiceImpl implements ItemService {
         Item item = ItemMapper.toItem(itemDto);
         itemChecker(item);
         Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            item.setOwner(userOptional.get());
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException(String.format("Пользователя с id = %d не существует", userId));
+        }
+        item.setOwner(userOptional.get());
+        if (itemDto.getRequestId() == null) {
+            item.setRequest(null);
+            return ItemMapper.toItemDto(itemRepository.save(item));
+        } else if (itemDto.getRequestId() > 0) {
+            Optional<ItemRequest> request = itemRequestRepository.findById(itemDto.getRequestId());
+            if (request.isEmpty()) {
+                throw new ItemRequestException(String.format("Запрос с id = %d отсутствует.", itemDto.getRequestId()));
+            }
+            item.setRequest(request.get());
             return ItemMapper.toItemDto(itemRepository.save(item));
         } else {
-            throw new UserNotFoundException(String.format("Пользователь с id = %d не существует", userId));
+            throw new ItemRequestException("id запроса не может быть отрицательным.");
         }
     }
 
@@ -150,18 +165,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text) {
-        List<Item> searchResult = new ArrayList<>();
+    public List<ItemDto> search(String text, Pageable pageable) {
         if (Objects.equals(text, "")) {
             return new ArrayList<>();
         }
-        List<Item> items = itemRepository.search(text);
-        for (Item item : items) {
-            if (item.getAvailable()) {
-                searchResult.add(item);
-            }
-        }
-        return searchResult.stream()
+        return itemRepository.findByNameOrDescription(text, pageable).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }

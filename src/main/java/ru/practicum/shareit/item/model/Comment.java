@@ -19,7 +19,6 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = "text")
     private String text;
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
@@ -28,6 +27,4 @@ public class Comment {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
     private LocalDateTime created;
-
-
 }
