@@ -36,8 +36,6 @@ public class ItemServiceImplTest {
 
     private UserDto userDto;
 
-
-
     @BeforeEach
     void setUp() {
         itemDto = ItemDto.builder()
@@ -127,12 +125,12 @@ public class ItemServiceImplTest {
         createItemTest();
         itemDto.setDescription("desc");
         itemDto.setName("updatedName");
-        assertThrows(UserNotFoundException.class, () -> itemService.updateItem(itemDto,1L , 2L));
+        assertThrows(UserNotFoundException.class, () -> itemService.updateItem(itemDto, 1L, 2L));
     }
 
     @Test
     void updateItemNotExistsTest() {
-        assertThrows(UserNotFoundException.class, () -> itemService.updateItem(itemDto,1L , 2L));
+        assertThrows(UserNotFoundException.class, () -> itemService.updateItem(itemDto, 1L, 2L));
     }
 
     @Test

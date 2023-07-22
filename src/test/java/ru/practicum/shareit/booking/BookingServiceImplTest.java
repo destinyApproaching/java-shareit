@@ -88,10 +88,8 @@ public class BookingServiceImplTest {
     @Test
     void createBookingItemNotAvailableTest() {
         createBookingTest();
-
         item.setAvailable(false);
-        itemService.updateItem(item,1L , 1L);
-
+        itemService.updateItem(item,1L, 1L);
         BookingDto bookingDto = getBookingDto(LocalDateTime.now().plusMinutes(1), LocalDateTime.now().plusMinutes(6));
         assertThrows(ItemNotAvailable.class, () -> bookingService.createBooking(2L, bookingDto));
     }
@@ -118,7 +116,6 @@ public class BookingServiceImplTest {
         assertEquals(1L, bookingDto.getItem().getId());
         assertEquals(2L, bookingDto.getBooker().getId());
         assertEquals(Status.WAITING, bookingDto.getStatus());
-
         bookingService.changeStatus(1L, 1L, false);
         bookingDto = bookingService.getBooking(1L, 1L);
         assertEquals(Status.REJECTED, bookingDto.getStatus());
@@ -160,7 +157,6 @@ public class BookingServiceImplTest {
         createBookingTest();
         List<BookingDto> bookings = bookingService.getBookingsOfUser(2L, "REJECTED", pageable);
         assertEquals(0, bookings.size());
-
         bookingService.changeStatus(1L, 1L, false);
         bookings = bookingService.getBookingsOfUser(2L, "REJECTED", pageable);
         assertEquals(1, bookings.size());
@@ -198,7 +194,6 @@ public class BookingServiceImplTest {
         createBookingTest();
         List<BookingDto> bookings = bookingService.getBookingsByItemOwner(1L, "WAITING", pageable);
         assertEquals(1, bookings.size());
-
         bookings = bookingService.getBookingsByItemOwner(2L, "WAITING", pageable);
         assertEquals(0, bookings.size());
     }
@@ -208,9 +203,7 @@ public class BookingServiceImplTest {
         createBookingTest();
         List<BookingDto> bookings = bookingService.getBookingsByItemOwner(1L, "REJECTED", pageable);
         assertEquals(0, bookings.size());
-
         bookingService.changeStatus(1L, 1L, false);
-
         bookings = bookingService.getBookingsByItemOwner(1L, "REJECTED", pageable);
         assertEquals(1, bookings.size());
     }
