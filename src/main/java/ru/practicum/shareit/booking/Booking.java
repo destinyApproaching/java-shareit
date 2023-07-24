@@ -35,6 +35,5 @@ public class Booking {
     @JoinColumn(name = "booker_id", nullable = false)
     private User booker;
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
     private Status status; // WAITING, APPROVED, REJECTED, CANCELED
 }
