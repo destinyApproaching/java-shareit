@@ -55,10 +55,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> searchText( @RequestHeader("X-Sharer-User-Id") Long userId,
-                                              @RequestParam(value = "text") String text,
-                                              @PositiveOrZero @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                              @Positive @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer size) {
+    public ResponseEntity<Object> searchText(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                             @RequestParam(value = "text") String text,
+                                             @PositiveOrZero @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                             @Positive @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer size) {
         return itemClient.searchText(userId, text, from, size);
     }
 
